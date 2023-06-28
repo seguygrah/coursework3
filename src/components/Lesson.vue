@@ -12,7 +12,7 @@
   
   <script>
   export default {
-    name: 'Lesson',
+    name: 'LessonItem',
     props: {
       lessons: {
         type: Array,

@@ -12,7 +12,7 @@
   
   <script>
   export default {
-    name: 'Checkout',
+    name: 'CheckoutItem',
     props: {
       cart: {
         type: Array,
