@@ -1,33 +1,86 @@
 <template>
-    <div class="checkout">
-      <h2>Shopping Cart</h2>
-      <ul>
-        <li v-for="lesson in cart" :key="lesson.id">
-          {{ lesson.name }} - ${{ lesson.price }}
-          <button @click="removeFromCart(lesson)">Remove</button>
-        </li>
-      </ul>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'CheckoutItem',
-    props: {
-      cart: {
-        type: Array,
-        required: true
+  <section style="display: inline-flex; align-items: start;">
+      <div id="Checkout">
+          <h2>Checkout Page</h2>
+          <div>
+              <div class="input_container">
+                  <label for="name">Name: </label>
+                  <input type="text" v-model.trim="user_data.name">
+              </div>
+              <div class="input_container">
+                  <label for="phone" pattern="[A-Za-z]">Phone: </label>
+                  <input type="text" v-model.trim="user_data.phone">
+              </div>
+              <button v-if="canCheckout" @click="checkout()">Checkout</button>
+          </div>
+      </div>
+      <div id="cart_container">
+          <h2>Cart({{cartItemCount}})</h2>
+          <div id="classlists">
+              <div class="classlist" v-for="item in getCartItems" :key="item.id">
+                  <img class="image" v-bind:src="item.item.image">
+                  <div class="info_container">
+                      <p>Title: {{item.item.title}}</p>
+                      <p>Location: {{item.item.location}}</p>
+                      <p>Price: {{item.item.price}}</p>
+                      <button  v-on:click="remove_from_cart(item)">Remove From Cart</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+  </section>
+</template>
+
+<script>
+//   import AppVue from '../App.vue'
+// import App from '@/App.vue';
+
+export default {
+  name: 'CartComponent',
+  props:{
+      cartItems: {
+          type: Array,
       }
-    },
-    methods: {
-      removeFromCart(lesson) {
-        this.$emit('removeLesson', lesson);
+  },
+  emits: ['remove-cart','order-submitted'],
+  computed:{
+      getCartItems(){
+          return this.cartItems
+      },
+      cartItemCount(){
+          return this.cartItems.length || "Empty";
+      },
+      
+      canRemoveFromCart(){
+          return this.cartItems.length > 0
+      },
+      canCheckout(){
+          const user = this.user_data
+          return user.name.match(/^[A-Za-z\s]+$/) && user.phone.match(/^[0-9]+$/)
       }
-    }
-  };
-  </script>
-  
-  <style scoped>
-  /* Add your CSS styles here */
-  </style>
-  
+  },
+  methods:{
+      remove_from_cart(data){
+          this.$emit("remove-cart",JSON.stringify(data))
+      },
+      checkout(){
+          alert("Order submited")
+          this.$emit("order-submitted")
+      }
+  },
+  data(){
+      return{
+          user_data:{
+              name:"",
+              phone:"",
+          }
+      }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+
+</style>
