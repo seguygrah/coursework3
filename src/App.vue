@@ -1,188 +1,125 @@
 <template>
-  <main>
-    <header>
-      <nav class="navbar navbar-expand-sm navbar-light bg-light">
-        <h1 style="color: black;" class="navbar-brand" v-text="sitename"></h1>
-        <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
-          aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <button class="btn btn-dark" v-if="cart.length > 0" v-on:click='showCheckout'>
-          {{cart.length}} <span class="fas fa-cart-plus"></span>Cart
-        </button> <br>
-        <div class="collapse navbar-collapse" id="collapsibleNavId">
-          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item">
-              <button class="btn btn-primary" v-on:click="type = 'title'">Subject</button>
-            </li>
-            <br>
-            <li class="nav-item">
-              <button class="btn btn-primary" v-on:click="type = 'price'">Price</button>
-            </li>
-            <br>
-            <li class="nav-item">
-              <button class="btn btn-primary" v-on:click="type = 'location'">Location</button>
-            </li>
-            <br>
-            <li class="nav-item dropdown">
-              <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" v-model="sort" id="sortby">
-                <option value="ascending">Ascending</option>
-                <option value="descending">Descending</option>
-              </select>
-            </li>
-          </ul>
-          <form class="form-inline my-2 my-lg-0">
-            <div class="search-wrapper">
-              <input v-on:input="filteredLessons" class="form-control mr-sm-2" type="text" v-model="search" placeholder="Search Subject or Location.." />
-            </div>
-          </form>
-        </div>
-      </nav>
-    </header>
-
-    <div class="root">
-      <main>
-        <div v-if='!showProduct' class="row">
-          <Lesson :sortedLessons="sortedLessons" @canAddToCart="canAddToCart" />
-        </div>
-        <div v-else class="row">
-          <Checkout :cart="cart" @removeFromCart="removeFromCart" @submit="submit" @showCheckout="showCheckout" />
-        </div>
-      </main>
-    </div>
-  </main>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<header>
+  <h1>{{sitename}}</h1>
+  <div style="align-self: flex-end; margin-right: 2rem;" v-if="showClasslists">
+      <button style="font-size: 1.15rem;" v-if="removeFromcart" @click="cycle">
+          {{cartItemCount}}
+          <i class="bx bx-cart"></i>
+          Checkout
+      </button>
+      <button v-else style="font-size: 1.15rem;" disabled="disabled">
+          {{cartItemCount}}
+          <i class="bx bx-cart"></i>
+      </button>
+  </div>
+  <div v-else>
+    <button style="font-size: 1.15rem;" @click="cycle">
+        <i class='bx bx-left-arrow-alt'></i>
+        Go back
+    </button>
+  </div>
+  <!-- <button @click="cycle" >{{currentViewStr}}</button> -->
+</header>
+<main>
+  <component :is="currentView" :cart-items="cart" :classlist-items="classlists"  
+  @add-cart="handleAddToCart"  @remove-cart="handleRemoveFromCart" 
+  @order-submitted="handleOrderSubmitted"/>
+</main>
 </template>
 
 <script>
+import Checkout from './components/Cart.vue'
 import Lesson from './components/Lesson.vue'
-import Checkout from './components/Checkout.vue'
+
 
 export default {
-  data() {
+name: 'App',
+created(){
+ this.loadClasslists()
+},
+computed:{
+  cartItemCount(){
+      return this.cart.length || "Empty";
+  },
+  removeFromcart(){
+      return this.cart.length > 0
+  },
+},
+data(){
     return {
-      search: '',
-      sitename: 'LessonHub',
-      sessions: [],
-      cart: [],
-      showProduct: false,
-      order: {
-        firstName: '',
-        lastName: '',
-      },
-      sort: 'ascending',
-      type: '',
-      user: {
-        name: '',
-        phone: ''
-      }
+        sitename:"After School Activities Store",
+        currentView: Lesson,
+        currentViewStr: "Cart",
+        showClasslists:true,
+        cart:[],
+        classlists:[]
     }
-  },
-  async created() {
-    let course = await fetch("mongodb+srv://grahkevinseguy:Tree0nice@cluster0.8q26p8n.mongodb.net/cw2/courses")
-    let result = await course.json()
-    this.sessions = result
-    console.log(result)
-  },
-  methods: {
-    filteredLessons() {
-      fetch(`mongodb+srv://grahkevinseguy:Tree0nice@cluster0.8q26p8n.mongodb.net/cw2/courses/search?key_word=${this.search}`)
-        .then(response => response.json())
-        .then(data => {
-          this.sessions = data
-        })
-    },
-    canAddToCart(lesson) {
-      this.sessions.find(item => item.id == lesson.id).availablespace -= 1;
-      this.cart.push({ cartId: (this.cart.length + 1), ...lesson });
-    },
-    removeFromCart(lesson) {
-      if (confirm('Remove from cart?')) {
-        this.cart = [...this.cart].filter(item => item.cartId != lesson.cartId)
-      }
-    },
-    showCheckout() {
-      this.showProduct = !this.showProduct;
-    },
-    submit(name, phone) {
-      console.log("Order Submitted")
-      let orders = {
-        checkoutName: name,
-        checkoutPhone: phone,
-        cartProduct: this.cart,
-      }
-      let order_details = JSON.stringify(orders)
-      fetch('mongodb+srv://grahkevinseguy:Tree0nice@cluster0.8q26p8n.mongodb.net/cw2/courses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        mode: "cors",
-        cache: "no-store",
-        body: order_details,
+},
+methods:{
+  loadClasslists(){
+    const port = 3000
+    fetch(`http://localhost:${port}/collection/lessons`).then((res)=>{
+      res.json().then((json)=>{
+          this.classlists = json.map((x)=>{
+              x["image"] = `/assets/${x["image"]}`
+              return x
+          })
       })
-        .then(response => response.json())
-        .then(json_response => {
-          console.log(json_response)
-          this.submitForm()
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    phonenumber(phone) {
-      // You need to define the 'phoneno' variable or import it from another module
-      if ((phone.match(phone))) {
-        return true;
-      }
-    },
-    submitForm() {
-      alert("Submitted")
-    },
+    })
   },
-  computed: {
-    total() {
-      return this.cart.length > 0 ? this.cart.map(item => item.price).reduce((acc, cur) => acc + cur) : 0;
-    },
+  handleAddToCart(data) {
+    data = JSON.parse(data)
+    for (let i = 0; i < this.classlists.length; i++) {
+        const classlist = this.classlists[i]
+        if(data["item"]._id == classlist._id){
+            classlist.spaces--
+        }
+    }
+    this.cart.push(data)
+  },
+  handleRemoveFromCart(data) {
+    data = JSON.parse(data)
 
-    // Everything here is for sorting lessons
-    sortedLessons() {
-      switch (this.type) {
-        case 'title':
-          return [...this.sessions].sort((a, b) => {
-            switch (this.sort) {
-              case 'ascending':
-                return a.title.toUpperCase() > b.title.toUpperCase() ? 1 : -1;
-              default:
-                return a.title.toUpperCase() < b.title.toUpperCase() ? 1 : -1;
-            }
-          })
-        case 'location':
-          return [...this.sessions].sort((a, b) => {
-            switch (this.sort) {
-              case 'ascending':
-                return a.location.toUpperCase() > b.location.toUpperCase() ? 1 : -1;
-              default:
-                return a.location.toUpperCase() < b.location.toUpperCase() ? 1 : -1;
-            }
-          })
-        case 'price':
-          return [...this.sessions].sort((a, b) => {
-            return this.sort == 'ascending' ? a.price - b.price : b.price - a.price;
-          })
-        case 'availablespace':
-          return [...this.sessions].sort((a, b) => {
-            return this.sort == 'ascending' ? a.availablespace - b.availablespace : b.availablespace - a.availablespace;
-          })
-        default:
-          return [...this.sessions].sort((a, b) => {
-            return this.sort == 'ascending' ? a.id - b.id : b.id - a.id;
-          })
-      }
+    const temp = []
+    for (let i = 0; i < this.cart.length; i++) {
+        const cart_item = this.cart[i]
+        if(data["id"] != cart_item["id"]){
+          temp.push(cart_item)
+        }
+    }
+
+    this.cart = []
+
+    temp.forEach(x =>{
+      this.cart.push(x)
+    })
+    for (let i = 0; i < this.classlists.length; i++) {
+        const classlist = this.classlists[i]
+        if(data["item"]._id == classlist._id){
+            classlist.spaces++
+        }
     }
   },
-  components: {
-    Lesson,
-    Checkout
+  handleOrderSubmitted(){
+    this.cart = []
+    this.cycle()
+  },
+  cycle(){
+      if(this.currentView["name"] == Lesson["name"]){
+        this.currentView = Checkout
+        this.currentViewStr = "Go Back"
+        this.showClasslists = false
+      }else{
+        this.currentView = Lesson
+        this.currentViewStr = "Cart"
+        this.showClasslists = true
+      }
   }
 }
+}
 </script>
+
+<style>
+
+</style>
