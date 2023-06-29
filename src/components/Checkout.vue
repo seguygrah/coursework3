@@ -5,13 +5,13 @@
           <div>
               <div class="input_container">
                   <label for="name">Name: </label>
-                  <input type="text" v-model.trim="user_data.name">
+                  <input type="text" v-model.trim="user_D.name">
               </div>
               <div class="input_container">
                   <label for="phone" pattern="[A-Za-z]">Phone: </label>
-                  <input type="text" v-model.trim="user_data.phone">
+                  <input type="text" v-model.trim="user_D.phone">
               </div>
-              <button v-if="canCheckout" @click="checkout()">Checkout</button>
+              <button v-if="u_Checkout" @click="checkout()">Checkout</button>
           </div>
       </div>
       <div id="cart_container">
@@ -37,26 +37,26 @@
 // import App from '@/App.vue';
 
 export default {
-  name: 'CartComponent',
+  name: 'CartComp',
   props:{
-      cartItems: {
+      Cart_I: {
           type: Array,
       }
   },
   emits: ['remove-cart','order-submitted'],
   computed:{
       getCartItems(){
-          return this.cartItems
+          return this.Cart_I
       },
       cartItemCount(){
-          return this.cartItems.length || "Empty";
+          return this.Cart_I.length || "Empty";
       },
       
-      canRemoveFromCart(){
-          return this.cartItems.length > 0
+      removeFromCart(){
+          return this.Cart_I.length > 0
       },
-      canCheckout(){
-          const user = this.user_data
+      u_Checkout(){
+          const user = this.user_D
           return user.name.match(/^[A-Za-z\s]+$/) && user.phone.match(/^[0-9]+$/)
       }
   },
@@ -71,7 +71,7 @@ export default {
   },
   data(){
       return{
-          user_data:{
+          user_D:{
               name:"",
               phone:"",
           }
