@@ -42,7 +42,7 @@
 
         <div id="classlists">
           <div class="classlist" v-for="item in classlist_copy" :key="item.id">
-            <img class="image" :src="`/images/${item.image}`" alt="Lesson Image">
+            <img class="image" :src="item.image" alt="" width="100%">
             <div class="info_container">
               <p>title: {{item.title}}</p>
               <p>Location: {{item.location}}</p>

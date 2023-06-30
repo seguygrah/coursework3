@@ -18,7 +18,7 @@
           <h2>Cart({{cartItemCount}})</h2>
           <div id="classlists">
               <div class="classlist" v-for="item in getCartItems" :key="item.id">
-                  <img class="image" v-bind:src="item.item.image">
+                  <img class="image" v-bind:src="item.item.image" alt="" width="100%">
                   <div class="info_container">
                       <p>Title: {{item.item.title}}</p>
                       <p>Location: {{item.item.location}}</p>

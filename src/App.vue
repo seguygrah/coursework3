@@ -59,7 +59,7 @@ export default {
       fetch(`http://localhost:${port}/collection/courses`).then((res) => {
         res.json().then((json) => {
           this.classlists = json.map((x) => {
-            x.image = `public/images/${x.image}`
+            x["image"] = `/${x["image"]}`
             return x
           })
         })
