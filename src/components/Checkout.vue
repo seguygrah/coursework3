@@ -37,7 +37,7 @@
 // import App from '@/App.vue';
 
 export default {
-  name: 'CartComp',
+  name: 'CartComponent',
   props:{
       cartItems: {
           type: Array,

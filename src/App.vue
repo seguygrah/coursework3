@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import Checkout from './components/Checkout.vue'
-import Lesson from './components/Lesson.vue'
+import CartComponent from './components/Checkout.vue'
+import LessonComponent from './components/Lesson.vue'
 
 export default {
   name: 'App',
@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       sitename: 'After School Activities Store',
-      currentView: Lesson,
+      currentView: LessonComponent,
       showClasslists: true,
       cart: [],
       classlists: [],
@@ -70,7 +70,7 @@ export default {
       const item = data.item
       for (let i = 0; i < this.classlists.length; i++) {
         const classlist = this.classlists[i]
-        if (item._id === classlist._id) {
+        if (data["item"]._id === classlist._id) {
           item.availablespace--
           break
         }
@@ -85,7 +85,7 @@ export default {
       const item = data.item
       for (let i = 0; i < this.classlists.length; i++) {
         const classlist = this.classlists[i]
-        if (item._id === classlist._id) {
+        if (data["item"]._id === classlist._id) {
           item.availablespace++
           break
         }
@@ -96,11 +96,11 @@ export default {
       this.cycle()
     },
     cycle() {
-      if (this.currentView.name === Lesson.name) {
-        this.currentView = Checkout
+      if (this.currentView.name === LessonComponent.name) {
+        this.currentView = CartComponent
         this.showClasslists = false
       } else {
-        this.currentView = Lesson
+        this.currentView = LessonComponent
         this.showClasslists = true
       }
     },

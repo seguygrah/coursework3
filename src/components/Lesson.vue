@@ -60,7 +60,7 @@
 
 <script>
 export default {
-  name: 'LessonComp',
+  name: 'LessonComponent',
   props: {
     classlistItems: {
       type: Array,
@@ -77,8 +77,8 @@ export default {
     add_to_cart(item) {
       const id = `${item.title[0]}` + item.id + `${item.location[0]}` + Math.ceil(Math.random() * 1000000);
       let data = {
-        id: id,
-        item: item,
+        "id": id,
+        "item": item,
       };
       this.$emit('add-cart', JSON.stringify(data));
     },
