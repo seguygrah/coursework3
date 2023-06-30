@@ -3,10 +3,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs')
-const mongodb = require('mongodb');
+const client = require('mongodb').MongoClient;
 
-const MongoClient = mongodb.MongoClient;
-const ObjectID = mongodb.ObjectID;
+// const client = mongodb.MongoClient;
+const ObjectID = require('mongodb').ObjectId;
 
 const app = express();
 const port = 3000;
@@ -17,43 +17,45 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+
+
 // MongoDB Connection
 const mongoURL = 'mongodb+srv://grahkevinseguy:Tree0nice@cluster0.8q26p8n.mongodb.net/test';
+let db;
+console.log(mongoURL);
+const dbName = 'cw2';
+//let db; // Initialize db variable
 
-const client = new MongoClient(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true });
+// Connect to MongoDB
+console.log(client);
+client.connect(mongoURL,(err, cli) => {
+console.log(err);
+    db = cli.db("cw2"); // Assign db instance
+    console.log(db);
+});
 
-// Connect to the MongoDB server
-client.connect((err) => {
-  if (err) {
-    console.error('Failed to connect to the database:', err);
-    return;
-  }
-
-  console.log('Connected to the database');
-
-  const db = client.db('cw2');
-
-    app.use(function (req, res, next){
-    console.log(`${req.method} ${req.url}`);
-    next();
-    });
+// Middleware - Logger
+app.use(function (req, res, next){
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware - Static File
-    app.use((req, res, next) => {
-    const imagePath = path.join(__dirname, 'images', req.url);
-    if (fs.existsSync(imagePath)) {
-        res.sendFile(imagePath);
-    } else {
-        next()
-        
-    }
-    });
+app.use((req, res, next) => {
+  const imagePath = path.join(__dirname, 'images', req.url);
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(imagePath);
+  } else {
+    next()
+    
+  }
+});
 
 // Middleware - Param: collectionName
-    app.param('collectionName', function (req, res, next, collectionName) {
-    req.collection = db.collection(collectionName);
-    return next();
-    });
+app.param('collectionName', function (req, res, next, collectionName) {
+  req.collection = db.collection(collectionName);
+  return next();
+});
 
 // Routes - Get all
 app.get('/collection/:collectionName', function (req, res) {
@@ -93,5 +95,4 @@ app.put('/collection/:collectionName/:id', function (req, res,next) {
 // Start the server
 app.listen(port, function () {
     console.log(`Server running on port ${port}`);
-});
 });

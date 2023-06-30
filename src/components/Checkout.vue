@@ -11,7 +11,7 @@
                   <label for="phone" pattern="[A-Za-z]">Phone: </label>
                   <input type="text" v-model.trim="user_D.phone">
               </div>
-              <button v-if="u_Checkout" @click="checkout()">Checkout</button>
+              <button v-if="uCheckout" @click="checkout()">Checkout</button>
           </div>
       </div>
       <div id="cart_container">
@@ -39,23 +39,23 @@
 export default {
   name: 'CartComp',
   props:{
-      Cart_I: {
+      cartItems: {
           type: Array,
       }
   },
   emits: ['remove-cart','order-submitted'],
   computed:{
       getCartItems(){
-          return this.Cart_I
+          return this.cartItems
       },
       cartItemCount(){
-          return this.Cart_I.length || "Empty";
+          return this.cartItems.length || "Empty";
       },
       
-      removeFromCart(){
-          return this.Cart_I.length > 0
+      uremovefromcart(){
+          return this.cartItems.length > 0
       },
-      u_Checkout(){
+      uCheckout(){
           const user = this.user_D
           return user.name.match(/^[A-Za-z\s]+$/) && user.phone.match(/^[0-9]+$/)
       }
