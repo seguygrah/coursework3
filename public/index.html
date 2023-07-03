@@ -9,14 +9,13 @@
     <title>After Class Activities</title>
   </head>
   <body>
+    <!-- Display a message if JavaScript is disabled -->
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <!-- Mount the Vue application to the app div -->
     <div id="app"></div>
-    <!-- built files will be auto injected -->
-    <!--Make sure to replace "/path/to/vue.js" and "/path/to/main.js" 
-    with the correct paths to the Vue.js library and your main.js file, respectively.-->
-    <!-- <script src="/path/to/vue.js"></script> -->
+    <!-- Include the main.js file which contains the Vue application logic -->
     <script src="../src/main.js"></script>
   </body>
 </html>

@@ -2,15 +2,15 @@
   <div>
     <h1>Lesson Page</h1>
     <section style="display: flex; flex-direction: row; width: 100%;">
+      <!-- Filter & Order section -->
       <section style="width: 30%;">
         <h3>Filter & Order</h3>
-        <!-- div element to encapsulate the sorting div and order div -->
-
+        
+        <!-- Div element to encapsulate sorting and ordering -->
         <div id="filters" style="display:flex; flex-direction: column; align-self: flex-start; width: 100%;">
           <h3 style="margin: 0.5rem 0;">Filter</h3>
-
-          <!-- div element to encapsulate the sorting input radios -->
-
+          
+          <!-- Div element for sorting options -->
           <div id="sort">
             <div v-for="(value, key) in sort_dict" :key="value.id">
               <input type="radio" name="sort" value="key" v-if="value.checked" checked v-on:click="sort(key)">
@@ -19,9 +19,8 @@
             </div>
           </div>
           <h3 style="margin: 0.5rem 0;">Order</h3>
-
-          <!-- div element to encapsulate the order input radios -->
-
+          
+          <!-- Div element for ordering options -->
           <div id="order">
             <div v-for="(value, key) in order_dict" :key="value.id">
               <input type="radio" name="order" value="key" v-if="value.checked" checked v-on:click="order(key)">
@@ -32,6 +31,7 @@
         </div>
       </section>
 
+      <!-- Lesson list section -->
       <section style="width: 100%;">
         <div style="width: 100%; display: inline-flex; align-items: center; justify-content: flex-start;">
           <div id="search">
@@ -41,6 +41,7 @@
         </div>
 
         <div id="classlists">
+          <!-- Iterate over classlist items -->
           <div class="classlist" v-for="item in classlist_copy" :key="item.id">
             <img class="image" :src="item.image" alt="" width="100%">
             <div class="info_container">
@@ -71,9 +72,11 @@ export default {
     this.loadClasslists();
   },
   methods: {
+    // Toggle display of classlists section
     showCheckout() {
       this.showClasslists = this.showClasslists ? false : true;
     },
+    // Add an item to the cart
     add_to_cart(item) {
       const id = `${item.title[0]}` + item.id + `${item.location[0]}` + Math.ceil(Math.random() * 1000000);
       let data = {
@@ -82,6 +85,7 @@ export default {
       };
       this.$emit('add-cart', JSON.stringify(data));
     },
+    // Perform search functionality
     search_func(query) {
       let val = this.sort_value.toLowerCase();
 
@@ -101,14 +105,17 @@ export default {
         this.order_sort(this.sort_value);
       }
     },
+    // Handle ordering selection
     order(value) {
       this.order_value = value;
       this.order_sort(this.sort_value);
     },
+    // Handle sorting selection
     sort(value) {
       this.sort_value = value;
       this.order_sort(value);
     },
+    // Order and sort the classlist items
     order_sort(criteria) {
       criteria = criteria.toLowerCase();
       if (criteria != 'all') {
@@ -124,6 +131,7 @@ export default {
         this.loadClasslists();
       }
     },
+    // Load the classlist items
     loadClasslists() {
       this.classlist_copy = [];
 
@@ -158,12 +166,15 @@ export default {
     };
   },
   computed: {
+    // Calculate the count of items in the cart
     cartItemCount() {
       return this.cart.length || 'Empty';
     },
+    // Check if there are items in the cart to enable removal
     uremovefromcart() {
       return this.cart.length > 0;
     },
+    // Perform search when the search input changes
     search() {
       this.search_func(this.searchInput);
       return true;
